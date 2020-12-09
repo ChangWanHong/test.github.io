@@ -1,24 +1,38 @@
 (function () {
   'use strict';
 
-  const URL = './audio/yodel.mp3';
+  const URL_MP3 = './audio/yodel.mp3';
+  const URL_AAC= './audio/aactest.mp4';
 
-  const context = new AudioContext();
-  const playButton = document.querySelector('#play');
+  const contextMP3 = new AudioContext();
+  const playButtonMP3 = document.querySelector('#play_mp3');
 
-  let yodelBuffer;
+  const contextAAC = new AudioContext();
+  const playButtonAAC = document.querySelector('#play_aac');
 
-  window.fetch(URL)
+  let bufferMP3;
+  let bufferAAC;
+
+  window.fetch(URL_MP3)
     .then(response => response.arrayBuffer())
-    .then(arrayBuffer => context.decodeAudioData(arrayBuffer))
+    .then(arrayBuffer => contextMP3.decodeAudioData(arrayBuffer))
     .then(audioBuffer => {
-      playButton.disabled = false;
-      yodelBuffer = audioBuffer;
+      playButtonMP3.disabled = false;
+      bufferMP3 = audioBuffer;
     });
 
-    playButton.onclick = () => play(yodelBuffer);
+  window.fetch(URL_AAC)
+    .then(response => response.arrayBuffer())
+    .then(arrayBuffer => contextAAC.decodeAudioData(arrayBuffer))
+    .then(audioBuffer => {
+      playButtonAAC.disabled = false;
+      bufferAAC = audioBuffer;
+    });
 
-  function play(audioBuffer) {
+  playButtonMP3.onclick = () => play(bufferMP3, contextMP3);
+  playButtonAAC.onclick = () => play(bufferAAC, contextAAC);
+
+  function play(audioBuffer, context) {
     const source = context.createBufferSource();
     source.buffer = audioBuffer;
     source.connect(context.destination);
